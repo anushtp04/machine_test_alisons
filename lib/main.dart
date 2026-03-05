@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:machine_test_alisons/blocs/home/home_bloc.dart';
 import 'package:machine_test_alisons/screens/home_page.dart';
 import 'package:machine_test_alisons/screens/login_page.dart';
 import 'blocs/auth/auth_bloc.dart';
@@ -18,6 +19,7 @@ class MyApp extends StatelessWidget {
     return MultiBlocProvider(
       providers: [
         BlocProvider(create: (context) => AuthBloc()..add(CheckAuthStatus())),
+        BlocProvider(create: (context) => HomeBloc()),
       ],
       child: MaterialApp(
         title: 'Flutter Machine Test',
@@ -39,4 +41,3 @@ class MyApp extends StatelessWidget {
     );
   }
 }
-

@@ -9,6 +9,7 @@ class HomeResponse {
   final int success;
   final String message;
   final List<BannerModel> banner1;
+  final List<BannerModel> banner2;
   final List<Product> newArrivals;
   final List<CategoryModel> categories;
   final List<Brand> featuredBrands;
@@ -18,6 +19,7 @@ class HomeResponse {
     required this.success,
     required this.message,
     required this.banner1,
+    required this.banner2,
     required this.newArrivals,
     required this.categories,
     required this.featuredBrands,
@@ -28,21 +30,30 @@ class HomeResponse {
     return HomeResponse(
       success: json['success'] ?? 0,
       message: json['message'] ?? '',
-      banner1: (json['banner1'] as List?)
-          ?.map((e) => BannerModel.fromJson(e))
-          .toList() ??
+      banner1:
+          (json['banner1'] as List?)
+              ?.map((e) => BannerModel.fromJson(e))
+              .toList() ??
           [],
-      newArrivals: (json['newarrivals'] as List?)
-          ?.map((e) => Product.fromJson(e))
-          .toList() ??
+      banner2:
+          (json['banner2'] as List?)
+              ?.map((e) => BannerModel.fromJson(e))
+              .toList() ??
           [],
-      categories: (json['categories'] as List?)
-          ?.map((e) => CategoryModel.fromJson(e))
-          .toList() ??
+      newArrivals:
+          (json['newarrivals'] as List?)
+              ?.map((e) => Product.fromJson(e))
+              .toList() ??
           [],
-      featuredBrands: (json['featuredbrands'] as List?)
-          ?.map((e) => Brand.fromJson(e))
-          .toList() ??
+      categories:
+          (json['categories'] as List?)
+              ?.map((e) => CategoryModel.fromJson(e))
+              .toList() ??
+          [],
+      featuredBrands:
+          (json['featuredbrands'] as List?)
+              ?.map((e) => Brand.fromJson(e))
+              .toList() ??
           [],
       currency: Currency.fromJson(json['currency']),
     );

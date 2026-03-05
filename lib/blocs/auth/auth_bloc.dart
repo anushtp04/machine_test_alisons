@@ -1,13 +1,16 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:machine_test_alisons/services/api_service.dart';
 import 'package:machine_test_alisons/utils/constants/app_constants.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'auth_event.dart';
 import 'auth_state.dart';
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
-  static const String _tokenKey = 'auth_token';
+  final ApiService _apiService;
 
-  AuthBloc() : super(AuthInitial()) {
+  AuthBloc({ApiService? apiService})
+    : _apiService = apiService ?? ApiService(),
+      super(AuthInitial()) {
     on<CheckAuthStatus>(_onCheckAuthStatus);
     on<LoginRequested>(_onLoginRequested);
     on<LogoutRequested>(_onLogoutRequested);
@@ -19,10 +22,11 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   ) async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      final token = prefs.getString(_tokenKey);
+      final id = prefs.getString(AppConstants.spKeyId);
+      final token = prefs.getString(AppConstants.spKeyToken);
 
-      if (token != null) {
-        emit(Authenticated(token));
+      if (id != null && token != null) {
+        emit(Authenticated(id: id, token: token));
       } else {
         emit(Unauthenticated());
       }
@@ -37,16 +41,22 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   ) async {
     emit(AuthLoading());
     try {
-      await Future.delayed(const Duration(seconds: 1));
-      if (event.email == AppConstants.dummyEmail &&
-          event.password == AppConstants.dummyPassword) {
-        final prefs = await SharedPreferences.getInstance();
-        const dummyToken = 'dummy_token';
-        await prefs.setString(_tokenKey, dummyToken);
-        emit(const Authenticated(dummyToken));
-      } else {
+      final response = await _apiService.login(
+        emailPhone: event.email,
+        password: event.password,
+      );
 
-        emit(const AuthError('Invalid email or password'));
+      if (response['success'] == 1) {
+        final id = response['id']?.toString() ?? '';
+        final token = response['token']?.toString() ?? '';
+
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString(AppConstants.spKeyId, id);
+        await prefs.setString(AppConstants.spKeyToken, token);
+
+        emit(Authenticated(id: id, token: token));
+      } else {
+        emit(AuthError(response['message'] ?? 'Login failed'));
         emit(Unauthenticated());
       }
     } catch (e) {
@@ -62,7 +72,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     emit(AuthLoading());
     try {
       final prefs = await SharedPreferences.getInstance();
-      await prefs.remove(_tokenKey);
+      await prefs.remove(AppConstants.spKeyId);
+      await prefs.remove(AppConstants.spKeyToken);
       emit(Unauthenticated());
     } catch (_) {
       emit(Unauthenticated());

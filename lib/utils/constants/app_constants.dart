@@ -8,4 +8,8 @@ class AppConstants {
 
   static const String dummyEmail = 'mobile@alisonsgroup.com';
   static const String dummyPassword = '12345678';
+
+  // SharedPreferences keys
+  static const String spKeyId = 'user_id';
+  static const String spKeyToken = 'auth_token';
 }

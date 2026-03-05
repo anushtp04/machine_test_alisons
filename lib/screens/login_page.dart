@@ -6,6 +6,9 @@ import 'package:machine_test_alisons/blocs/auth/auth_state.dart';
 import 'package:machine_test_alisons/gen/assets.gen.dart';
 import 'package:machine_test_alisons/screens/home_page.dart';
 import 'package:machine_test_alisons/utils/constants/app_colors.dart';
+import 'package:machine_test_alisons/utils/constants/app_typography.dart';
+import 'package:machine_test_alisons/widget/buttons/custom_button.dart';
+import 'package:machine_test_alisons/widget/inputfields/textfield.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -41,6 +44,7 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.background,
       body: BlocListener<AuthBloc, AuthState>(
         listener: (context, state) {
           if (state is Authenticated) {
@@ -79,11 +83,10 @@ class _LoginScreenState extends State<LoginScreen> {
                           alignment: Alignment.topRight,
                           child: TextButton(
                             onPressed: () {},
-                            child: const Text(
+                            child: Text(
                               'Skip >',
-                              style: TextStyle(
+                              style: AppTypography.textMd.copyWith(
                                 color: Colors.white,
-                                fontSize: 16,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
@@ -107,8 +110,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     children: [
                       Text(
                         'Login',
-                        style: Theme.of(context).textTheme.displaySmall
-                            ?.copyWith(
+                        style: AppTypography.text4xl.copyWith(
                           fontWeight: FontWeight.bold,
                           color: AppColors.textPrimary,
                         ),
@@ -116,57 +118,38 @@ class _LoginScreenState extends State<LoginScreen> {
                       const SizedBox(height: 32),
 
                       // Email Field
-                      const Text(
-                        'Email Address',
-                        style: TextStyle(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 16,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      TextFormField(
+                      AppFormField(
+                        label: "Email Address",
+                        hintText: "Johndoe@gmail.com",
                         controller: _emailController,
-                        decoration: const InputDecoration(
-                          hintText: 'johndoe@gmail.com',
-                        ),
                         validator: (value) {
-                          if (value == null || value.trim().isEmpty) {
-                            return 'Please enter your email';
+                          if (value == null || value.isEmpty) {
+                            return "Please enter your email";
                           }
                           return null;
                         },
                       ),
-
                       const SizedBox(height: 24),
-
-                      // Password Field
-                      const Text(
-                        'Password',
-                        style: TextStyle(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 16,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      TextFormField(
+                      AppFormField(
+                        label: "Password",
+                        hintText: "********",
                         controller: _passwordController,
                         obscureText: _obscurePassword,
-                        decoration: InputDecoration(
-                          hintText: '********',
-                          suffixIcon: IconButton(
-                            icon: Icon(
-                              _obscurePassword
-                                  ? Icons.visibility_off
-                                  : Icons.visibility,
-                              color: Colors.grey,
-                            ),
-                            onPressed: () {
-                              setState(() {
-                                _obscurePassword = !_obscurePassword;
-                              });
-                            },
+
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            _obscurePassword
+                                ? Icons.visibility_off
+                                : Icons.visibility,
+                            color: Colors.grey,
                           ),
+                          onPressed: () {
+                            setState(() {
+                              _obscurePassword = !_obscurePassword;
+                            });
+                          },
                         ),
+
                         validator: (value) {
                           if (value == null || value.isEmpty) {
                             return 'Please enter your password';
@@ -175,47 +158,18 @@ class _LoginScreenState extends State<LoginScreen> {
                         },
                       ),
 
-                      const SizedBox(height: 16),
-
-                      // Forgot password
-                      Align(
-                        alignment: Alignment.centerRight,
-                        child: TextButton(
-                          onPressed: () {},
-                          child: const Text(
-                            'Forgot password?',
-                            style: TextStyle(
-                              color: AppColors.textSecondary,
-                              decoration: TextDecoration.underline,
-                            ),
-                          ),
-                        ),
-                      ),
-
+                      // Password Field
                       const SizedBox(height: 24),
 
                       // Login Button
-                      SizedBox(
-                        width: double.infinity,
-                        child: BlocBuilder<AuthBloc, AuthState>(
-                          builder: (context, state) {
-                            if (state is AuthLoading) {
-                              return ElevatedButton(
-                                onPressed: null,
-                                child: const CircularProgressIndicator(
-                                  color: Colors.white,
-                                ),
-                              );
-                            }
-                            return ElevatedButton(
-                              onPressed: _onLoginPressed,
-                              child: const Text(
-                                'Login',
-                                style: TextStyle(fontSize: 18),
-                              ),
-                            );
-                          },
-                        ),
+                      BlocBuilder<AuthBloc, AuthState>(
+                        builder: (context, state) {
+                          return CustomButton(
+                            text: 'Login',
+                            onPressed: _onLoginPressed,
+                            isLoading: state is AuthLoading,
+                          );
+                        },
                       ),
 
                       const SizedBox(height: 32),
@@ -224,15 +178,17 @@ class _LoginScreenState extends State<LoginScreen> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const Text(
+                          Text(
                             "Don't Have an account? ",
-                            style: TextStyle(color: AppColors.textSecondary),
+                            style: AppTypography.textSm.copyWith(
+                              color: AppColors.textSecondary,
+                            ),
                           ),
                           GestureDetector(
                             onTap: () {},
-                            child: const Text(
+                            child: Text(
                               'Sign Up',
-                              style: TextStyle(
+                              style: AppTypography.textSm.copyWith(
                                 fontWeight: FontWeight.bold,
                                 decoration: TextDecoration.underline,
                                 color: AppColors.textPrimary,

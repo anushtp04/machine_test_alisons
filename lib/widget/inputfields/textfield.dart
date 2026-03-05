@@ -1,19 +1,21 @@
 import 'package:flutter/material.dart';
 
-class AppTextField extends StatelessWidget {
+class AppFormField extends StatelessWidget {
   final String label;
   final String hintText;
-  final bool isPassword;
   final TextEditingController controller;
+  final bool obscureText;
   final Widget? suffixIcon;
+  final String? Function(String?)? validator;
 
-  const AppTextField({
+  const AppFormField({
     super.key,
     required this.label,
     required this.hintText,
     required this.controller,
-    this.isPassword = false,
+    this.obscureText = false,
     this.suffixIcon,
+    this.validator,
   });
 
   @override
@@ -33,14 +35,15 @@ class AppTextField extends StatelessWidget {
 
         const SizedBox(height: 8),
 
-        /// TextField
-        TextField(
+        /// TextFormField
+        TextFormField(
           controller: controller,
-          obscureText: isPassword,
+          obscureText: obscureText,
+          validator: validator,
           decoration: InputDecoration(
             hintText: hintText,
             filled: true,
-            fillColor: const Color(0xffF5F5F5),
+            fillColor: Colors.white,
 
             suffixIcon: suffixIcon,
 
