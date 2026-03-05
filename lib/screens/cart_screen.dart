@@ -47,15 +47,17 @@ class _CartScreenState extends State<CartScreen> {
                 return Card(
                   margin: const EdgeInsets.only(bottom: 12),
                   child: ListTile(
-                    title: Text(item.name),
-                    subtitle: Text('₹${item.price}'),
+                    title: Text(item.product.name),
+                    subtitle: Text('₹${item.product.price} x ${item.quantity}'),
                     trailing: IconButton(
                       icon: const Icon(
                         Icons.delete_outline,
                         color: AppColors.error,
                       ),
                       onPressed: () {
-                        context.read<CartBloc>().add(RemoveFromCart(item.slug));
+                        context.read<CartBloc>().add(
+                          RemoveFromCart(item.product),
+                        );
                       },
                     ),
                   ),

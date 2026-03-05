@@ -252,7 +252,7 @@ class ProductDetailsScreen extends StatelessWidget {
                                   },
                                   onAddToCart: () {
                                     context.read<CartBloc>().add(
-                                      AddToCart(related[index].slug),
+                                      AddToCart(related[index]),
                                     );
                                   },
                                   onFavorite: () {},
@@ -288,7 +288,7 @@ class ProductDetailsScreen extends StatelessWidget {
             height: 50,
             child: ElevatedButton.icon(
               onPressed: () {
-                context.read<CartBloc>().add(AddToCart(product.slug));
+                context.read<CartBloc>().add(AddToCart(product));
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(content: Text('${product.name} added to cart')),
                 );

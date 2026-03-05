@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:machine_test_alisons/blocs/cart/cart_bloc.dart';
+import 'package:machine_test_alisons/blocs/cart/cart_event.dart';
+import 'package:machine_test_alisons/blocs/cart/cart_state.dart';
 import 'package:machine_test_alisons/models/product_model.dart';
 import 'package:machine_test_alisons/utils/constants/app_colors.dart';
 import 'package:machine_test_alisons/utils/constants/app_typography.dart';
@@ -52,7 +56,13 @@ class ProductCard extends StatelessWidget {
               child: Stack(
                 children: [
                   // Image
-                  Padding(
+                  Container(
+                    decoration: const BoxDecoration(
+                      color: Color(0xFFF9F9F9),
+                      borderRadius: BorderRadius.vertical(
+                        top: Radius.circular(12),
+                      ),
+                    ),
                     padding: const EdgeInsets.all(16.0),
                     child: Center(
                       child: product.image.isNotEmpty
@@ -60,7 +70,7 @@ class ProductCard extends StatelessWidget {
                               imageUrl: product.image,
                               fit: BoxFit.contain,
                               placeholder: (context, url) => Container(
-                                color: Colors.grey[50],
+                                color: Colors.transparent,
                                 child: const Center(
                                   child: CircularProgressIndicator(
                                     strokeWidth: 2,
@@ -69,7 +79,7 @@ class ProductCard extends StatelessWidget {
                                 ),
                               ),
                               errorWidget: (context, url, error) => Container(
-                                color: Colors.grey[50],
+                                color: Colors.transparent,
                                 child: const Icon(
                                   Icons.image_not_supported,
                                   color: Colors.grey,
@@ -77,7 +87,7 @@ class ProductCard extends StatelessWidget {
                               ),
                             )
                           : Container(
-                              color: Colors.grey[50],
+                              color: Colors.transparent,
                               child: const Icon(
                                 Icons.image_not_supported,
                                 color: Colors.grey,
@@ -167,35 +177,103 @@ class ProductCard extends StatelessWidget {
                     ],
                   ),
                   const SizedBox(height: 10),
-                  // Add Button
-                  GestureDetector(
-                    onTap: onAddToCart,
-                    child: Container(
-                      height: 32,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(6),
-                        border: Border.all(color: AppColors.primary),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            'Add',
-                            style: AppTypography.textSm.copyWith(
-                              color: AppColors.primary,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                          const SizedBox(width: 4),
-                          const Icon(
-                            Icons.shopping_cart_outlined,
-                            size: 16,
+                  // Add Button / Counter
+                  BlocBuilder<CartBloc, CartState>(
+                    builder: (context, state) {
+                      int qty = 0;
+                      if (state is CartLoaded) {
+                        final idx = state.items.indexWhere(
+                          (item) => item.product.slug == product.slug,
+                        );
+                        if (idx >= 0) qty = state.items[idx].quantity;
+                      }
+
+                      if (qty > 0) {
+                        return Container(
+                          height: 32,
+                          decoration: BoxDecoration(
                             color: AppColors.primary,
+                            borderRadius: BorderRadius.circular(6),
                           ),
-                        ],
-                      ),
-                    ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              GestureDetector(
+                                onTap: () => context.read<CartBloc>().add(
+                                  DecrementCartItem(product),
+                                ),
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 8,
+                                    vertical: 4,
+                                  ),
+                                  color: Colors.transparent,
+                                  child: const Icon(
+                                    Icons.remove,
+                                    color: Colors.white,
+                                    size: 16,
+                                  ),
+                                ),
+                              ),
+                              Text(
+                                '$qty',
+                                style: AppTypography.textSm.copyWith(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              GestureDetector(
+                                onTap: () => context.read<CartBloc>().add(
+                                  AddToCart(product),
+                                ),
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 8,
+                                    vertical: 4,
+                                  ),
+                                  color: Colors.transparent,
+                                  child: const Icon(
+                                    Icons.add,
+                                    color: Colors.white,
+                                    size: 16,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      }
+
+                      return GestureDetector(
+                        onTap: onAddToCart,
+                        child: Container(
+                          height: 32,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(6),
+                            border: Border.all(color: AppColors.primary),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                'Add',
+                                style: AppTypography.textSm.copyWith(
+                                  color: AppColors.primary,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              const SizedBox(width: 4),
+                              const Icon(
+                                Icons.shopping_cart_outlined,
+                                size: 16,
+                                color: AppColors.primary,
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
                   ),
                 ],
               ),

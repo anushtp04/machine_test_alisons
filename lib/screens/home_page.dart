@@ -15,6 +15,7 @@ import 'package:machine_test_alisons/widget/banner_widget.dart';
 import 'package:machine_test_alisons/widget/category_item.dart';
 import 'package:machine_test_alisons/widget/product_card.dart';
 import 'package:machine_test_alisons/widget/section_header.dart';
+import 'package:machine_test_alisons/gen/assets.gen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -55,7 +56,10 @@ class _HomeScreenState extends State<HomeScreen> {
             color: Colors.white.withOpacity(0.2),
             borderRadius: BorderRadius.circular(10),
           ),
-          child: const Icon(Icons.eco, color: Colors.white, size: 24),
+          child: Padding(
+            padding: const EdgeInsets.all(6.0),
+            child: Assets.png.logo.image(),
+          ),
         ),
         actions: [
           _buildTopBarIcon(Icons.search),
@@ -264,7 +268,7 @@ class _HomeScreenState extends State<HomeScreen> {
               );
             },
             onAddToCart: () {
-              context.read<CartBloc>().add(AddToCart(products[index].slug));
+              context.read<CartBloc>().add(AddToCart(products[index]));
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text('${products[index].name} added to cart'),

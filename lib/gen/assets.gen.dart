@@ -17,8 +17,11 @@ class $AssetsPngGen {
   /// File path: assets/png/login.png
   AssetGenImage get login => const AssetGenImage('assets/png/login.png');
 
+  /// File path: assets/png/logo.png
+  AssetGenImage get logo => const AssetGenImage('assets/png/logo.png');
+
   /// List of all assets
-  List<AssetGenImage> get values => [login];
+  List<AssetGenImage> get values => [login, logo];
 }
 
 class Assets {

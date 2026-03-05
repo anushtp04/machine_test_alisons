@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:machine_test_alisons/models/product_model.dart';
 
 abstract class CartEvent extends Equatable {
   const CartEvent();
@@ -10,19 +11,28 @@ abstract class CartEvent extends Equatable {
 class LoadCart extends CartEvent {}
 
 class AddToCart extends CartEvent {
-  final String productSlug;
+  final Product product;
 
-  const AddToCart(this.productSlug);
+  const AddToCart(this.product);
 
   @override
-  List<Object> get props => [productSlug];
+  List<Object> get props => [product];
+}
+
+class DecrementCartItem extends CartEvent {
+  final Product product;
+
+  const DecrementCartItem(this.product);
+
+  @override
+  List<Object> get props => [product];
 }
 
 class RemoveFromCart extends CartEvent {
-  final String productSlug;
+  final Product product;
 
-  const RemoveFromCart(this.productSlug);
+  const RemoveFromCart(this.product);
 
   @override
-  List<Object> get props => [productSlug];
+  List<Object> get props => [product];
 }
