@@ -2,13 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:machine_test_alisons/blocs/auth/auth_state.dart';
 import 'package:machine_test_alisons/blocs/auth/auth_bloc.dart';
+import 'package:machine_test_alisons/blocs/cart/cart_bloc.dart';
+import 'package:machine_test_alisons/blocs/cart/cart_event.dart';
 import 'package:machine_test_alisons/blocs/home/home_bloc.dart';
 import 'package:machine_test_alisons/blocs/home/home_event.dart';
 import 'package:machine_test_alisons/blocs/home/home_state.dart';
+import 'package:machine_test_alisons/screens/product_details_screen.dart';
 import 'package:machine_test_alisons/models/home_response_model.dart';
 import 'package:machine_test_alisons/models/product_model.dart';
 import 'package:machine_test_alisons/utils/constants/app_colors.dart';
-import 'package:machine_test_alisons/utils/constants/app_typography.dart';
 import 'package:machine_test_alisons/widget/banner_widget.dart';
 import 'package:machine_test_alisons/widget/category_item.dart';
 import 'package:machine_test_alisons/widget/product_card.dart';
@@ -22,8 +24,6 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  int _currentNavIndex = 0;
-
   @override
   void initState() {
     super.initState();
@@ -32,48 +32,68 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void _loadHomeData() {
     final authState = context.read<AuthBloc>().state;
+    String id = '';
+    String token = '';
     if (authState is Authenticated) {
-      context.read<HomeBloc>().add(
-        LoadHome(id: authState.id, token: authState.token),
-      );
+      id = authState.id;
+      token = authState.token;
     }
+    context.read<HomeBloc>().add(LoadHome(id: id, token: token));
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      body: SafeArea(
-        child: BlocBuilder<HomeBloc, HomeState>(
-          builder: (context, state) {
-            if (state is HomeLoading) {
-              return const Center(
-                child: CircularProgressIndicator(color: AppColors.primary),
-              );
-            }
-            if (state is HomeError) {
-              return Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(state.message),
-                    const SizedBox(height: 16),
-                    ElevatedButton(
-                      onPressed: _loadHomeData,
-                      child: const Text('Retry'),
-                    ),
-                  ],
-                ),
-              );
-            }
-            if (state is HomeLoaded) {
-              return _buildHomeContent(state.homeData);
-            }
-            return const SizedBox.shrink();
-          },
+      appBar: AppBar(
+        backgroundColor: AppColors.primary,
+        elevation: 0,
+        title: Container(
+          width: 40,
+          height: 40,
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.2),
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: const Icon(Icons.eco, color: Colors.white, size: 24),
         ),
+        actions: [
+          _buildTopBarIcon(Icons.search),
+          const SizedBox(width: 12),
+          _buildTopBarIcon(Icons.favorite_border),
+          const SizedBox(width: 12),
+          _buildTopBarIcon(Icons.notifications_none),
+          const SizedBox(width: 16),
+        ],
       ),
-      bottomNavigationBar: _buildBottomNavBar(),
+      body: BlocBuilder<HomeBloc, HomeState>(
+        builder: (context, state) {
+          if (state is HomeLoading) {
+            return const Center(
+              child: CircularProgressIndicator(color: AppColors.primary),
+            );
+          }
+          if (state is HomeError) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(state.message),
+                  const SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: _loadHomeData,
+                    child: const Text('Retry'),
+                  ),
+                ],
+              ),
+            );
+          }
+          if (state is HomeLoaded) {
+            return _buildHomeContent(state.homeData);
+          }
+          return const SizedBox.shrink();
+        },
+      ),
     );
   }
 
@@ -98,9 +118,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return CustomScrollView(
       slivers: [
-        // Top App Bar
-        SliverToBoxAdapter(child: _buildTopBar()),
-
         // Banner 1
         if (data.banner1.isNotEmpty)
           SliverToBoxAdapter(
@@ -191,42 +208,15 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildTopBar() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: Row(
-        children: [
-          // Logo area
-          Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              color: AppColors.primary.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: const Icon(Icons.eco, color: AppColors.primary, size: 24),
-          ),
-          const Spacer(),
-          _buildTopBarIcon(Icons.search),
-          const SizedBox(width: 12),
-          _buildTopBarIcon(Icons.favorite_border),
-          const SizedBox(width: 12),
-          _buildTopBarIcon(Icons.notifications_none),
-        ],
-      ),
-    );
-  }
-
   Widget _buildTopBarIcon(IconData icon) {
     return Container(
       width: 36,
       height: 36,
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Colors.white.withOpacity(0.2),
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: AppColors.lightGrey),
       ),
-      child: Icon(icon, size: 20, color: AppColors.textPrimary),
+      child: Icon(icon, size: 20, color: Colors.white),
     );
   }
 
@@ -264,73 +254,26 @@ class _HomeScreenState extends State<HomeScreen> {
         itemBuilder: (context, index) {
           return ProductCard(
             product: products[index],
-            onTap: () {},
-            onAddToCart: () {},
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) =>
+                      ProductDetailsScreen(product: products[index]),
+                ),
+              );
+            },
+            onAddToCart: () {
+              context.read<CartBloc>().add(AddToCart(products[index].slug));
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('${products[index].name} added to cart'),
+                ),
+              );
+            },
             onFavorite: () {},
           );
         },
-      ),
-    );
-  }
-
-  Widget _buildBottomNavBar() {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.08),
-            blurRadius: 10,
-            offset: const Offset(0, -2),
-          ),
-        ],
-      ),
-      child: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              _buildNavItem(Icons.home, 'Home', 0),
-              _buildNavItem(Icons.grid_view, 'Categories', 1),
-              _buildNavItem(Icons.shopping_cart_outlined, 'Cart', 2),
-              _buildNavItem(Icons.person_outline, 'Profile', 3),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildNavItem(IconData icon, String label, int index) {
-    final isSelected = _currentNavIndex == index;
-    return GestureDetector(
-      onTap: () {
-        setState(() {
-          _currentNavIndex = index;
-        });
-      },
-      behavior: HitTestBehavior.opaque,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              icon,
-              size: 24,
-              color: isSelected ? AppColors.primary : AppColors.textSecondary,
-            ),
-            const SizedBox(height: 4),
-            Text(
-              label,
-              style: AppTypography.textXs.copyWith(
-                color: isSelected ? AppColors.primary : AppColors.textSecondary,
-                fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
-              ),
-            ),
-          ],
-        ),
       ),
     );
   }

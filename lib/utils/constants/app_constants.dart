@@ -12,4 +12,5 @@ class AppConstants {
   // SharedPreferences keys
   static const String spKeyId = 'user_id';
   static const String spKeyToken = 'auth_token';
+  static const String spKeySkipped = 'auth_skipped';
 }

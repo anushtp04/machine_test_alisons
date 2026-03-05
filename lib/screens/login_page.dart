@@ -82,7 +82,9 @@ class _LoginScreenState extends State<LoginScreen> {
                         child: Align(
                           alignment: Alignment.topRight,
                           child: TextButton(
-                            onPressed: () {},
+                            onPressed: () {
+                              context.read<AuthBloc>().add(SkipRequested());
+                            },
                             child: Text(
                               'Skip >',
                               style: AppTypography.textMd.copyWith(
