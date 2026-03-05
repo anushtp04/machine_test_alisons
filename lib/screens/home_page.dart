@@ -16,6 +16,7 @@ import 'package:machine_test_alisons/widget/category_item.dart';
 import 'package:machine_test_alisons/widget/product_card.dart';
 import 'package:machine_test_alisons/widget/section_header.dart';
 import 'package:machine_test_alisons/gen/assets.gen.dart';
+import 'package:machine_test_alisons/screens/favorite_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -64,7 +65,15 @@ class _HomeScreenState extends State<HomeScreen> {
         actions: [
           _buildTopBarIcon(Icons.search),
           const SizedBox(width: 12),
-          _buildTopBarIcon(Icons.favorite_border),
+          GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const FavoriteScreen()),
+              );
+            },
+            child: _buildTopBarIcon(Icons.favorite_border),
+          ),
           const SizedBox(width: 12),
           _buildTopBarIcon(Icons.notifications_none),
           const SizedBox(width: 16),

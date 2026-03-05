@@ -3,6 +3,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:machine_test_alisons/blocs/cart/cart_bloc.dart';
 import 'package:machine_test_alisons/blocs/cart/cart_event.dart';
 import 'package:machine_test_alisons/blocs/cart/cart_state.dart';
+import 'package:machine_test_alisons/blocs/favorite/favorite_bloc.dart';
+import 'package:machine_test_alisons/blocs/favorite/favorite_event.dart';
+import 'package:machine_test_alisons/blocs/favorite/favorite_state.dart';
 import 'package:machine_test_alisons/models/product_model.dart';
 import 'package:machine_test_alisons/utils/constants/app_colors.dart';
 import 'package:machine_test_alisons/utils/constants/app_typography.dart';
@@ -126,13 +129,29 @@ class ProductCard extends StatelessWidget {
                   Positioned(
                     top: 8,
                     right: 8,
-                    child: GestureDetector(
-                      onTap: onFavorite,
-                      child: const Icon(
-                        Icons.favorite_border,
-                        size: 20,
-                        color: AppColors.primary,
-                      ),
+                    child: BlocBuilder<FavoriteBloc, FavoriteState>(
+                      builder: (context, state) {
+                        bool isFavorite = false;
+                        if (state is FavoriteUpdated) {
+                          isFavorite = state.favoriteSlugs.contains(
+                            product.slug,
+                          );
+                        }
+
+                        return GestureDetector(
+                          onTap: () {
+                            context.read<FavoriteBloc>().add(
+                              ToggleFavorite(product.slug),
+                            );
+                            if (onFavorite != null) onFavorite!();
+                          },
+                          child: Icon(
+                            isFavorite ? Icons.favorite : Icons.favorite_border,
+                            size: 20,
+                            color: isFavorite ? Colors.red : AppColors.primary,
+                          ),
+                        );
+                      },
                     ),
                   ),
                 ],

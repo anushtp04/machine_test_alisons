@@ -4,6 +4,7 @@ import 'package:machine_test_alisons/blocs/home/home_bloc.dart';
 import 'package:machine_test_alisons/blocs/category/category_bloc.dart';
 import 'package:machine_test_alisons/blocs/cart/cart_bloc.dart';
 import 'package:machine_test_alisons/blocs/profile/profile_bloc.dart';
+import 'package:machine_test_alisons/blocs/favorite/favorite_bloc.dart';
 import 'package:machine_test_alisons/screens/main_screen.dart';
 import 'package:machine_test_alisons/screens/login_page.dart';
 import 'blocs/auth/auth_bloc.dart';
@@ -26,6 +27,7 @@ class MyApp extends StatelessWidget {
         BlocProvider(create: (context) => CategoryBloc()),
         BlocProvider(create: (context) => CartBloc()),
         BlocProvider(create: (context) => ProfileBloc()),
+        BlocProvider(create: (context) => FavoriteBloc()),
       ],
       child: MaterialApp(
         title: 'Flutter Machine Test',

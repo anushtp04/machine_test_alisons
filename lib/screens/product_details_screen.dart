@@ -3,6 +3,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:machine_test_alisons/blocs/cart/cart_bloc.dart';
 import 'package:machine_test_alisons/blocs/cart/cart_event.dart';
+import 'package:machine_test_alisons/blocs/favorite/favorite_bloc.dart';
+import 'package:machine_test_alisons/blocs/favorite/favorite_event.dart';
+import 'package:machine_test_alisons/blocs/favorite/favorite_state.dart';
 import 'package:machine_test_alisons/blocs/home/home_bloc.dart';
 import 'package:machine_test_alisons/blocs/home/home_state.dart';
 import 'package:machine_test_alisons/models/product_model.dart';
@@ -92,13 +95,28 @@ class ProductDetailsScreen extends StatelessWidget {
                   Positioned(
                     top: 0,
                     right: 0,
-                    child: GestureDetector(
-                      onTap: () {},
-                      child: const Icon(
-                        Icons.favorite_border,
-                        color: AppColors.primary,
-                        size: 24,
-                      ),
+                    child: BlocBuilder<FavoriteBloc, FavoriteState>(
+                      builder: (context, state) {
+                        bool isFavorite = false;
+                        if (state is FavoriteUpdated) {
+                          isFavorite = state.favoriteSlugs.contains(
+                            product.slug,
+                          );
+                        }
+
+                        return GestureDetector(
+                          onTap: () {
+                            context.read<FavoriteBloc>().add(
+                              ToggleFavorite(product.slug),
+                            );
+                          },
+                          child: Icon(
+                            isFavorite ? Icons.favorite : Icons.favorite_border,
+                            color: isFavorite ? Colors.red : AppColors.primary,
+                            size: 24,
+                          ),
+                        );
+                      },
                     ),
                   ),
                 ],
